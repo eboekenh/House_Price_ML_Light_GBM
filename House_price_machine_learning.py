@@ -27,7 +27,6 @@ df.shape
 
 df.columns
 
-
 ######################################
 # EDA
 ######################################
@@ -35,7 +34,6 @@ df.columns
 check_df(df)
 
 cat_cols, cat_but_car, num_cols, num_but_cat = grab_col_names(df, car_th=10)
-
 
 ######################################
 # KATEGORIK DEGISKEN ANALIZI
@@ -49,7 +47,6 @@ for col in cat_but_car:
 
 for col in num_but_cat:
     cat_summary(df, col)
-
 
 ######################################
 # SAYISAL DEGISKEN ANALIZI
@@ -113,7 +110,6 @@ df['Sold-RemodeAdd'] =(df['YrSold'] - df['YearRemodAdd']).dt.days
 df.drop(["YearBuilt","YearRemodAdd","GarageYrBlt","YrSold"],axis=1,inplace=True)
 cat_cols, cat_but_car, num_cols, num_but_cat = grab_col_names(df, car_th=10)
 
-
 ######################################
 # MISSING_VALUES
 ######################################
@@ -138,7 +134,6 @@ na_cols = [col for col in num_cols if df[col].isnull().sum() > 0 and "SalePrice"
 df[na_cols] = df[na_cols].apply(lambda x: x.fillna(x.median()), axis=0)
 
 df.isnull().sum()
-
 
 df.GarageCars.dtype
 
@@ -195,11 +190,6 @@ for col in num_cols:
 
 rare_analyser(df, "SalePrice", 0.01)
 df = rare_encoder(df, 0.01)
-
-#drop_list = ["Utilities", "LandSlope", "PoolQC", "MiscFeature"]
-
-
-
 rare_analyser(df, "SalePrice", 0.01)
 
 ######################################
@@ -216,7 +206,6 @@ binary_cols = [col for col in df.columns if len(df[col].unique()) ==2]
 
 for col in binary_cols:
     df = label_encoder(df, col)
-
 
 
 ######################################
@@ -306,24 +295,3 @@ def plot_importance(model, features, num=len(X), save=False):
 
 
 plot_importance(lgbm_tuned, X_train, 20)
-
-
-#######################################
-# SONUCLARIN YUKLENMESI
-#######################################
-
-submission_df = pd.DataFrame()
-submission_df['Id'] = test_df["Id"]
-
-test_df.isnull().sum()
-y_pred_sub = lgbm_tuned.predict(test_df.drop("Id", axis=1))
-y_pred_sub = np.expm1(y_pred_sub)
-
-submission_df['SalePrice'] = y_pred_sub.astype(int)
-submission_df['Id']=submission_df['Id'].astype(int)
-submission_df['SalePrice'].dtypes
-
-submission_df.head()
-submission_df.dtypes
-
-submission_df.to_csv('submission_lgbm2.csv', index=False)
