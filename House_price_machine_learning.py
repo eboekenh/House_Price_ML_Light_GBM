@@ -41,7 +41,7 @@ pd.set_option('display.float_format', lambda x: '%.3f' % x)
 # Load train and test sets, then concatenate them for joint preprocessing
 train = pd.read_csv("train.csv")
 test = pd.read_csv("test.csv")
-df = train.append(test).reset_index(drop=True)
+df = pd.concat([train, test], ignore_index=True)
 df.head()
 #df.info
 df.shape

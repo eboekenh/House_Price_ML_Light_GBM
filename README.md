@@ -1,108 +1,91 @@
 # 🏠 House Price Prediction with LightGBM
 
-> **Kaggle competition entry: advanced regression techniques using gradient boosting to predict residential house sale prices.**
+Regression model predicting residential home sale prices in Ames, Iowa using LightGBM with extensive feature engineering.
 
-[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
-[![LightGBM](https://img.shields.io/badge/LightGBM-Gradient%20Boosting-brightgreen.svg)](https://lightgbm.readthedocs.io/)
-[![Kaggle](https://img.shields.io/badge/Kaggle-Competition-20BEFF.svg)](https://www.kaggle.com/c/house-prices-advanced-regression-techniques)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)]()
+![Python](https://img.shields.io/badge/Python-3.8+-blue)
+![LightGBM](https://img.shields.io/badge/LightGBM-3.3+-brightgreen)
+![Kaggle](https://img.shields.io/badge/Kaggle-0.126_RMSLE-yellow)
+![License](https://img.shields.io/badge/License-MIT-green)
 
----
+## Problem Statement
 
-## 📖 About the Project
+Predict the final sale price of homes based on 80+ features describing physical attributes, location, and condition. Based on the [Kaggle House Prices competition](https://www.kaggle.com/c/house-prices-advanced-regression-techniques).
 
-This project is a solution for the **[Kaggle House Prices: Advanced Regression Techniques](https://www.kaggle.com/c/house-prices-advanced-regression-techniques)** competition. The goal is to predict the final sale price of residential homes in Ames, Iowa, using 79 explanatory variables describing nearly every aspect of the property.
+## Approach
 
-LightGBM (Light Gradient Boosting Machine) was chosen for its speed, efficiency, and strong performance on structured/tabular data with mixed feature types.
+1. **Data Merging** — Train and test sets concatenated for consistent preprocessing
+2. **EDA** — Column classification, distribution analysis, correlation inspection
+3. **Feature Engineering** — Total bathrooms, total area, porch area, building age, sale-to-build gap
+4. **Missing Value Handling** — Garage NaN → "No garage"; high-missingness columns dropped; numerical median / categorical mode fill
+5. **Outlier Handling** — IQR-based winsorization (1st/99th percentile)
+6. **Rare Category Encoding** — Categories with <1% frequency merged into "Rare"
+7. **Encoding** — One-hot encoding for categorical columns, label encoding for binary columns
+8. **Model** — LightGBM with GridSearchCV (10-fold CV)
 
----
+## Results
 
-## 🎯 Problem Statement
+| Metric | Value |
+|--------|-------|
+| Kaggle Public Leaderboard (RMSLE) | **0.126** |
+| Evaluation Metric | RMSE on log-transformed SalePrice |
 
-**Predict the sale price of a house** given features such as:
-- Square footage, lot size, and number of rooms
-- Neighborhood and location data
-- Construction year and renovation history
-- Quality and condition ratings
-- Garage, basement, and pool features
+**Best Hyperparameters (GridSearchCV):**
 
----
+| Parameter | Value |
+|-----------|-------|
+| learning_rate | 0.005 |
+| n_estimators | 10,000 |
+| max_depth | 3 |
+| colsample_bytree | 0.2 |
+| num_leaves | 8 |
 
-## ✨ Key Features
+## Engineered Features
 
-- **Feature Engineering**: Handling of missing values, encoding of categorical variables, and creation of new interaction features
-- **LightGBM Regression**: Fast gradient-boosted decision tree model optimized for tabular data
-- **Cross-Validation**: K-Fold validation to prevent overfitting
-- **RMSE Optimization**: Model tuned to minimize Root Mean Squared Log Error (RMSLE)
+| Feature | Description |
+|---------|-------------|
+| `TOTALBATH` | Total bathrooms (full + 0.5 × half) |
+| `TotalSF` | Basement + above-grade living area |
+| `TotalFloorSF` | 1st floor + 2nd floor area |
+| `TotalPorchSF` | All porch types combined |
+| `BuiltAge` | Building age in days |
+| `Sold-Built` | Days between sale and construction |
+| `Sold-RemodeAdd` | Days between sale and last remodel |
 
----
+## Tech Stack
 
-## 🔧 Tech Stack
+- **Python 3.8+** — Core language
+- **LightGBM** — Gradient boosting regressor
+- **Pandas / NumPy** — Data manipulation
+- **Scikit-learn** — GridSearchCV, metrics, preprocessing
+- **Seaborn / Matplotlib** — Visualization
 
-| Tool | Purpose |
-|---|---|
-| Python | Core language |
-| LightGBM | Gradient boosting model |
-| Pandas, NumPy | Data manipulation |
-| Scikit-learn | Preprocessing & cross-validation |
-| Matplotlib / Seaborn | EDA visualization |
-| Jupyter Notebook | Interactive development |
-
----
-
-## 📦 Project Structure
+## Project Structure
 
 ```
 House_Price_ML_Light_GBM/
-│
-├── notebooks/
-│   └── house_price_lightgbm.ipynb   # Main analysis & modeling notebook
-├── data/
-│   ├── train.csv                     # Training data (from Kaggle)
-│   └── test.csv                      # Test data (from Kaggle)
-├── submissions/
-│   └── submission.csv                # Kaggle submission file
+├── helpers/
+│   ├── __init__.py
+│   ├── data_prep.py          # Outlier handling, imputation, encoding utilities
+│   └── eda.py                # EDA summary and visualization functions
+├── House_price_machine_learning.py  # Main ML pipeline
 ├── requirements.txt
 └── README.md
 ```
 
----
-
-## 🚀 Getting Started
+## Getting Started
 
 ```bash
-# Clone the repository
 git clone https://github.com/eboekenh/House_Price_ML_Light_GBM.git
 cd House_Price_ML_Light_GBM
-
-# Install dependencies
 pip install -r requirements.txt
-
-# Run the notebook
-jupyter notebook notebooks/house_price_lightgbm.ipynb
 ```
 
-> **Note**: Download the dataset from [Kaggle](https://www.kaggle.com/c/house-prices-advanced-regression-techniques/data) and place `train.csv` and `test.csv` in the `data/` folder.
+Download `train.csv` and `test.csv` from the [Kaggle competition](https://www.kaggle.com/c/house-prices-advanced-regression-techniques/data) and place them in the project root.
 
----
+```bash
+python House_price_machine_learning.py
+```
 
-## 📊 Approach
+## License
 
-1. **Exploratory Data Analysis** — Understand distributions, outliers, and missing values
-2. **Data Preprocessing** — Imputation, encoding, and feature scaling
-3. **Feature Engineering** — Create new features from existing ones
-4. **Model Training** — LightGBM with K-Fold cross-validation
-5. **Hyperparameter Tuning** — Grid/random search for optimal parameters
-6. **Submission** — Generate final predictions for Kaggle leaderboard
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
----
-
-## 👤 Author
-
-**[@eboekenh](https://github.com/eboekenh)**
+MIT
